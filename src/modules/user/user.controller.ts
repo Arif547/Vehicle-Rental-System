@@ -7,7 +7,7 @@ try{
     const result = await userServices.signupUserIntoDB(req.body)
    return res.status(201).json({
         success: true,
-        message: "User Create success",
+        message: "User registered successfully",
         data : result.rows[0]
     })
    }catch(error: any){
