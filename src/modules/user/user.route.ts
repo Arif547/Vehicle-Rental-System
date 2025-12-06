@@ -1,18 +1,9 @@
 import { Request, Response, Router } from "express";
 import { pool } from "../../database/db";
+import { userController } from "./user.contorller";
 
 const router = Router()
 
-router.post('/', async (req: Request, res: Response) =>{
-    const {name, email, password, phone, role} = req.body;
-    const result = await pool.query(`
-        INSERT INTO users(name, email, password, phone, role) VALUES($1, $2, $3, $4, $5) RETURNING *
-        `,[name, email, password, phone, role] );
-    res.status(201).json({
-        success: true,
-        message: "User Create success",
-        data : result.rows[0]
-    })
-})
+router.post('/', userController.signUpUser)
 
 export const userRoute = router
