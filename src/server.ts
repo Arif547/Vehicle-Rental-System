@@ -11,9 +11,10 @@ app.use(express.json());
 
 initDB()
 
-app.use('/api/v1/auth/signup', userRoute)
+app.use('/api/v1/auth/signup', authRoute)
 app.use('/api/v1/auth/', authRoute)
 app.use('/api/v1/users', userRoute)
+
 
 app.get('/', (req: Request, res: Response) => {
   res.status(200).json({
