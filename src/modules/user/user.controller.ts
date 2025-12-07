@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { userServices } from "./user.service";
-import { pool } from "../../database/db";
+import { pool } from "../../config/db";
 
 
 const getAllUser = async (req: Request, res: Response) =>{

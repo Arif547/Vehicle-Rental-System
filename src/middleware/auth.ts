@@ -1,7 +1,7 @@
  require('dotenv').config();
 import { NextFunction, Request, Response } from "express"
 import jwt, { JwtPayload } from "jsonwebtoken";
-import { pool } from "../database/db";
+import { pool } from "../config/db";
 
 const auth = (...roles: string[]) =>{
     return async (req:Request , res: Response, next: NextFunction) =>{

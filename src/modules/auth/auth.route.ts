@@ -1,6 +1,6 @@
 import { Request, Response, Router } from "express";
 import { authController } from "./auth.controller";
-import auth from "../../middleware/auth";
+
 
 
 

@@ -1,5 +1,5 @@
 import bcrypt from "bcryptjs";
-import { pool } from "../../database/db";
+import { pool } from "../../config/db";
 
 
 

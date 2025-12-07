@@ -1,6 +1,7 @@
 require('dotenv').config();
 import bcrypt from "bcryptjs"
-import { pool } from "../../database/db"
+import { pool } from "../../config/db"
+import config from "../../config";
 import jwt from 'jsonwebtoken'
 
 const signupUserIntoDB = async(payload : Record<string, unknown>)=>{
@@ -38,7 +39,7 @@ const signinUserIntoDB = async (email: string, password: string) =>{
             role: user.rows[0].role
 
         }
-        const secretKey : any = process.env.JWT_KEY
+        const secretKey : any = config.jwtSecret;
         
         const token = jwt.sign(jwtPayload, secretKey ,{expiresIn : "3d"})
         delete user.rows[0].password
