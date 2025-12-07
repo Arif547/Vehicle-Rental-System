@@ -1,11 +1,12 @@
-import { Request, Response, Router } from "express";
-import { pool } from "../../database/db";
+import { Router } from "express";
 import { userController } from "./user.controller";
-import verify from "../../middleware/verify";
+import auth from "../../middleware/auth";
+import { Roles } from "../auth/auth.constant";
 
 
 const router = Router()
 
 router.post('/', userController.signUpUser)
+router.get('/', auth(Roles.admin), userController.getAllUser)
 
 export const userRoute = router
