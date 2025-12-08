@@ -1,3 +1,4 @@
+import { get } from "http";
 import { pool } from "../../config/db";
 
 const createBookingInDB = async (payload: Record<string, unknown>) => {
@@ -64,14 +65,82 @@ const createBookingInDB = async (payload: Record<string, unknown>) => {
             }
         };
     }
-
-
-
-
-
 }
+
+
+// const getAllBookingFromDB = async () => {
+//     // const allBookings = await pool.query(`SELECT  customer_id, vehicle_id, rent_start_date, rent_end_date, total_price, status FROM bookings`);
+
+
+
+//     // const user = await pool.query(`SELECT * FROM users WHERE id = $1`, [customer_id]);
+
+//     const result = await pool.query(`
+//     SELECT 
+//       b.id,
+//       b.customer_id,
+//       u.name AS customer_name,
+//       u.email AS customer_email,
+//       b.vehicle_id,
+//       v.vehicle_name,
+//       v.daily_rent_price,
+//       b.rent_start_date,
+//       b.rent_end_date,
+//       b.total_price,
+//       b.status
+//     FROM bookings b
+//     JOIN users u ON u.id = b.customer_id
+//     JOIN vehicles v ON v.id = b.vehicle_id
+//     ORDER BY B.id DESC
+//   `);
+
+//     return result;
+
+// }
+const getAllBookingsFromDB = async () => {
+    const result = await pool.query(`
+    SELECT 
+      b.id,
+      b.customer_id,
+      b.vehicle_id,
+      b.rent_start_date,
+      b.rent_end_date,
+      b.total_price,
+      b.status,
+      u.name AS customer_name,
+      u.email AS customer_email,
+      v.vehicle_name,
+      v.registration_number
+    FROM bookings b
+    JOIN users u ON u.id = b.customer_id
+    JOIN vehicles v ON v.id = b.vehicle_id
+    
+  `);
+
+    // Format output
+    const formatted = result.rows.map(row => ({
+        id: row.id,
+        customer_id: row.customer_id,
+        vehicle_id: row.vehicle_id,
+        rent_start_date: row.rent_start_date.toISOString().split("T")[0],
+        rent_end_date: row.rent_end_date.toISOString().split("T")[0],
+        total_price: row.total_price,
+        status: row.status,
+        customer: {
+            name: row.customer_name,
+            email: row.customer_email,
+        },
+        vehicle: {
+            vehicle_name: row.vehicle_name,
+            registration_number: row.registration_number,
+        }
+    }));
+
+    return formatted;
+};
 
 export const bookingService = {
     createBookingInDB,
+    getAllBookingsFromDB
 
 }
