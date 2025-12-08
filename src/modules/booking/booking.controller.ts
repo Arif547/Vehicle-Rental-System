@@ -25,9 +25,10 @@ const createBooking = async (req: Request, res: Response) => {
 }
 
 const getAllBookings = async (req: Request, res: Response) => {
-
     try {
-        const result = await bookingService.getAllBookingsFromDB()
+        const user = req.user as any;
+
+        const result = await bookingService.getAllBookingsFromDB(user);
 
 
         if (result.length === 0) {
@@ -39,7 +40,7 @@ const getAllBookings = async (req: Request, res: Response) => {
         }
         return res.status(201).json({
             success: true,
-            message: "Booking created successfully",
+            message: user.role === 'admin' ? "All bookings retrieved successfully" : "Your bookings retrieved successfully",
             data: result,
         })
     } catch (error: any) {
