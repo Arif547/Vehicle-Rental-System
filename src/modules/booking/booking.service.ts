@@ -51,7 +51,7 @@ const createBookingInDB = async (payload: Record<string, unknown>) => {
       RETURNING *
         `, [customer_id, vehicle_id, rent_start_date, rent_end_date, total_price]);
 
-        await pool.query(`UPDATE vehicles SET availability_status = 'rented' WHERE id = $1`, [vehicle_id]);
+        await pool.query(`UPDATE vehicles SET availability_status = 'booked' WHERE id = $1`, [vehicle_id]);
 
         return {
             success: true,
@@ -105,8 +105,95 @@ const getAllBookingsFromDB = async (user: any) => {
 
 };
 
+
+const bookingUpdateInDB = async (
+    bookingId: string,
+    status: string,
+    user: any
+) => {
+    // 1. Check booking exists
+    const booking = await pool.query(`SELECT * FROM bookings WHERE id = $1`, [
+        bookingId,
+    ]);
+
+    if (booking.rows.length === 0) {
+        return {
+            success: false,
+            statusCode: 404,
+            message: "Booking not found",
+        };
+    }
+
+    const b = booking.rows[0];
+
+    // 2. Customer cancellation rule
+    if (status === "cancelled") {
+        if (user.role !== "customer") {
+            return {
+                success: false,
+                statusCode: 403,
+                message: "Only customers can cancel bookings",
+            };
+        }
+
+        if (b.customer_id !== user.id) {
+            return {
+                success: false,
+                statusCode: 403,
+                message: "Unauthorized to cancel this booking",
+            };
+        }
+    }
+
+    // 3. Admin can mark as returned
+    let updatedVehicle: any = null;
+
+    if (status === "returned") {
+        if (user.role !== "admin") {
+            return {
+                success: false,
+                statusCode: 403,
+                message: "Only admin can mark booking as returned",
+            };
+        }
+
+        // Update vehicle availability
+        const vehicleUpdate = await pool.query(
+            `UPDATE vehicles SET availability_status = 'available' WHERE id = $1 RETURNING availability_status`,
+            [b.vehicle_id]
+        );
+
+        updatedVehicle = vehicleUpdate.rows[0];
+    }
+
+    // 4. Update booking status
+    const updatedBooking = await pool.query(
+        `
+    UPDATE bookings
+    SET status = $1 
+    WHERE id = $2
+    RETURNING *;
+    `,
+        [status, bookingId]
+    );
+
+    return {
+        success: true,
+        statusCode: 200,
+        message:
+            status === "cancelled"
+                ? "Booking cancelled successfully"
+                : "Booking marked as returned. Vehicle is now available",
+        data: {
+            ...updatedBooking.rows[0],
+            ...(updatedVehicle ? { vehicle: updatedVehicle } : {}),
+        },
+    };
+};
+
 export const bookingService = {
     createBookingInDB,
-    getAllBookingsFromDB
+    getAllBookingsFromDB,
+    bookingUpdateInDB
 
 }

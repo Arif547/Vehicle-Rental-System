@@ -22,16 +22,18 @@ const getSingleVehiclesFromDB = async (id: string) => {
 };
 
 const deleteVehicles = async (id: string) => {
-    // const bookingCheck = await pool.query(`
-    //     SELECT * FROM vehicles WHERE id = $1 AND availability_status = 'active'
-    //     `, [id])
 
-    // if (bookingCheck.rows.length > 0) {
-    //     return {
-    //         success: false,
-    //         message: "Vehicle cannot be deleted because it has active bookings."
-    //     };
-    // }
+    const bookingCheck = await pool.query(`
+      SELECT * FROM bookings WHERE vehicle_id = $1 AND status = 'active'
+      `, [id])
+
+    if (bookingCheck.rows.length > 0) {
+        return {
+            rowCount: 0,
+            success: false,
+            message: "Vehicle cannot be deleted because it has active bookings."
+        };
+    }
 
     const result = await pool.query(`DELETE FROM vehicles WHERE id = $1`, [id]);
 

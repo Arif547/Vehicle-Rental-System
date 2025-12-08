@@ -3,22 +3,22 @@ import { userServices } from "./user.service";
 import { pool } from "../../config/db";
 
 
-const getAllUser = async (req: Request, res: Response) =>{
-    
-try{
+const getAllUser = async (req: Request, res: Response) => {
+
+  try {
     const result = await userServices.getAllUserFromDB()
-   return res.status(201).json({
-        success: true,
-        message: "Users retrieved successfully",
-        data : result.rows,
+    return res.status(201).json({
+      success: true,
+      message: "Users retrieved successfully",
+      data: result.rows,
     })
-   }catch(error: any){
-   return res.status(500).json({
-        success: false,
-        message: error.message,
-        
+  } catch (error: any) {
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+
     })
-   }
+  }
 
 }
 
@@ -55,7 +55,7 @@ const deleteUser = async (req: Request, res: Response) => {
     if (result.rowCount === 0) {
       res.status(404).json({
         success: false,
-        message: "User not found",
+        message: (result as any).message || "User not found",
       });
     } else {
       res.status(200).json({
@@ -124,9 +124,9 @@ const updateUser = async (req: Request, res: Response) => {
 };
 
 
-export const userController = { 
-    getAllUser,
-    getSingleUser,
-    deleteUser,
-    updateUser
+export const userController = {
+  getAllUser,
+  getSingleUser,
+  deleteUser,
+  updateUser
 }   

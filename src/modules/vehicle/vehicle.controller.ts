@@ -82,7 +82,7 @@ const deleteVehicle = async (req: Request, res: Response) => {
         if (result.rowCount === 0) {
             res.status(404).json({
                 success: false,
-                message: "Vehicle not found",
+                message: (result as any).message || "Vehicle not found",
             });
         }
         else {
